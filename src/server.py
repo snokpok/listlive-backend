@@ -61,6 +61,7 @@ async def create_user(body: CreateUserBody):
         id, ack = insert_res.inserted_id, insert_res.acknowledged
         response = {
             "id": str(id),
+            "token": auth_repo.create_access_token(str(id)),
             "ack": ack,
         }
         return dict(response)
@@ -170,6 +171,36 @@ async def edit_todo(id: str, body: UpdateItemBody = Body(...)):
 @app.get("/decode-token")
 async def decode_token(token: str):
     return auth_repo.decode_access_token(token)
+
+
+class ChangeOrderItemBody(BaseModel):
+    item_id: str
+    new_order: int
+
+
+@app.put("/todo/change-order", dependencies=[Depends(verify_token_dependency)])
+async def change_order_todo(body: ChangeOrderItemBody):
+    todos = user_col.find_one({"_id": ObjectId(auth_repo.get_current_user_id())}).get(
+        "todos"
+    )
+    [todo] = [t for t in todos if t.get("id") == body.item_id]
+    pull_res = user_col.update_one(
+        {"_id": ObjectId(auth_repo.get_current_user_id())},
+        update={
+            "$pull": {"todos": {"id": todo.get("id")}},
+        },
+    )
+    change_order_res = user_col.update_one(
+        {"_id": ObjectId(auth_repo.get_current_user_id())},
+        update={
+            "$push": {"todos": {"$each": [todo], "$position": body.new_order}},
+        },
+    )
+    return {
+        "ack": change_order_res.acknowledged,
+        "raw": {"co": change_order_res.raw_result, "p": pull_res.raw_result},
+        "edit": todo,
+    }
 
 
 @app.get("/me", dependencies=[Depends(verify_token_dependency)])
