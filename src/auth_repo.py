@@ -28,7 +28,10 @@ class AuthRepository:
         bearer_token = headers.get("Authorization")
         if not bearer_token:
             raise HTTPException(status_code=401, detail="Token not found; unauthorized")
-        token = bearer_token.split(" ")[1]
+        bearer_token_split = bearer_token.split(" ")
+        if len(bearer_token_split) != 2:
+            raise HTTPException(status_code=401, detail="Token empty; unauthorized")
+        token = bearer_token_split[1]
         if not self.token or self.token != token:
             self.token = token
         try:

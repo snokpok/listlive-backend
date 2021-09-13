@@ -12,4 +12,3 @@ mongo_client = MongoClient(
 db = mongo_client["main"]
 user_col = db["users"]
 user_col.create_index("email", unique=True, background=True)
-todo_col = db["todos"]

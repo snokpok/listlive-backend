@@ -1,6 +1,6 @@
 import bson
 import pymongo
-from mongo import mongo_client, user_col, todo_col
+from mongo import mongo_client
 from bson.objectid import ObjectId
 from pydantic import BaseModel, Field
 from typing import Optional
