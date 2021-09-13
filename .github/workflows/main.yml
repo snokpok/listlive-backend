@@ -30,6 +30,5 @@ jobs:
       - name: Docker Build & Push Action
         uses: docker/build-push-action@v2
         with:
-          context: .
           push: true
-          tags: v1, latest
+          tags: snakpy/livelist-backend:latest
