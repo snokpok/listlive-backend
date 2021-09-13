@@ -21,7 +21,10 @@ class AuthRepository:
         return access_token
 
     def decode_access_token(self, token: str):
-        res = jwt.decode(token, key=configs.jwt_secret_key, algorithms=["HS256"])
+        try:
+            res = jwt.decode(token, key=configs.jwt_secret_key, algorithms=["HS256"])
+        except jwt.exceptions.DecodeError:
+            raise HTTPException(status_code=401, detail="Token not valid")
         return res
 
     def verify_decode_auth_header(self, headers: Header):
