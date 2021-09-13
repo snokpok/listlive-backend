@@ -16,12 +16,13 @@ auth_repo = AuthRepository()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:4002"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 user_col = mongo_client["main"]["users"]
+todo_list_col = mongo_client["main"]["todo-lists"]
 
 
 async def verify_token_dependency(authorization: str = Header(...)):
@@ -69,6 +70,24 @@ async def create_user(body: CreateUserBody):
         raise HTTPException(
             status_code=400, detail="Associated account with given email already exists"
         )
+
+
+class CreateListBody(BaseModel):
+    name: str
+    comment: Optional[str]
+
+
+@app.post("/todo/list", dependencies=[Depends(verify_token_dependency)])
+async def create_todo_list(body: CreateListBody):
+    res = todo_list_col.insert_one(
+        {
+            "name": body.name,
+            "comment": body.comment,
+            "items": [],
+            "owner": auth_repo.get_current_user_id(),
+        }
+    )
+    return {"ack": res.acknowledged, "id": str(res.inserted_id)}
 
 
 class LoginBody(BaseModel):

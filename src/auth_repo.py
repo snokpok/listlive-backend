@@ -37,6 +37,8 @@ class AuthRepository:
             )
             self.jwt_claims = claims
             return claims
+        except jwt.exceptions.InvalidSignatureError as e:
+            raise HTTPException(status_code=401, detail=str(e))
         except jwt.exceptions.DecodeError:
             raise HTTPException(
                 status_code=401,
