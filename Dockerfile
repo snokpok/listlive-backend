@@ -4,7 +4,8 @@ WORKDIR /srv/app/
 
 COPY ./requirements.txt .
 
-RUN ["ls"]
 RUN ["pip", "install", "-r", "requirements.txt"]
+
+COPY ./src ./src
 
 CMD ["python", "src/main.py"]
