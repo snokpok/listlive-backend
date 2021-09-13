@@ -2,7 +2,6 @@ import uvicorn
 import configs
 from server import app
 from mongo import user_col, todo_col, db
-from pprint import pprint
 
 if __name__ == "__main__":
     uvicorn.run(

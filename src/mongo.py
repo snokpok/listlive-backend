@@ -2,11 +2,12 @@ from pymongo import MongoClient
 import dotenv
 import configs
 import argparse
-from pprint import pprint
 import os
 
 
-mongo_client = MongoClient(configs._env_vals.get("ME_CONFIG_MONGODB_URL") + "main?authSource=admin")
+mongo_client = MongoClient(
+    configs._env_vals.get("ME_CONFIG_MONGODB_URL") + "main?authSource=admin"
+)
 
 db = mongo_client["main"]
 user_col = db["users"]

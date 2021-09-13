@@ -1,5 +1,4 @@
 import bson
-from pprint import pprint
 import pymongo
 from mongo import mongo_client, user_col, todo_col
 from bson.objectid import ObjectId
