@@ -53,3 +53,6 @@ class AuthRepository:
 
     def get_current_user_id(self) -> str:
         return self.jwt_claims.get("id")
+
+
+ar = AuthRepository()
