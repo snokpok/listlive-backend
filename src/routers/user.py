@@ -1,4 +1,4 @@
-from typing import Optional
+from bson.json_util import dumps
 from fastapi.routing import APIRouter
 from pydantic.main import BaseModel
 from mongo import user_col, list_col
@@ -7,6 +7,7 @@ from dependencies import verify_token_dependency
 from bson.objectid import ObjectId
 from fastapi import Depends
 from fastapi.routing import APIRouter
+import json
 
 user_router = APIRouter(
     prefix="/users", dependencies=[Depends(verify_token_dependency)]
@@ -22,7 +23,7 @@ async def get_all_users():
     )
     result_list = []
     for user in search_res:
-        user["_id"] = str(user.get("_id"))
+        user["_id"] = str(user["_id"])
         result_list.append(user)
     return result_list
 
@@ -47,8 +48,7 @@ async def edit_my_attribs(body: EditMeBody):
         {"$set": {"profile_emoji": body.profile_emoji}},
     )
     return {
-        "id": edit_res.upserted_id,
-        "raw": edit_res.raw_result,
+        "raw": json.loads(dumps(edit_res.raw_result)),
         "metas": {
             "matched": edit_res.matched_count,
             "modified": edit_res.modified_count,

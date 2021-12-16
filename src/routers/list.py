@@ -1,14 +1,14 @@
 from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
 from fastapi.routing import APIRouter
-from pydantic.fields import Undefined
-from pymongo.message import delete
 from mongo import user_col, list_col
 from auth_repo import ar
 from dependencies import verify_token_dependency
 from bson.objectid import ObjectId
 from fastapi import Depends
 from typing import Optional
+from bson.json_util import dumps as bdumps
+from json import loads as jloads
 
 list_router = APIRouter(
     prefix="/lists", dependencies=[Depends(verify_token_dependency)]
@@ -57,7 +57,7 @@ async def create_list(body: WriteListBody):
         "ack": insert_list_res.acknowledged,
         "user_col_ops": {
             "ack": insert_id_user_lists_res.acknowledged,
-            "raw": insert_id_user_lists_res.raw_result,
+            "raw": jloads(bdumps(insert_id_user_lists_res.raw_result)),
             "matched": insert_id_user_lists_res.matched_count,
             "modified": insert_id_user_lists_res.modified_count,
         },
@@ -71,7 +71,7 @@ async def edit_list_attrs(body: WriteListBody, list_id: str):
         {"$set": {"title": body.title, "description": body.description}},
     )
     return {
-        "raw": update_res.raw_result,
+        "raw": jloads(bdumps(update_res.raw_result)),
         "meta": {
             "matched": update_res.matched_count,
             "modified": update_res.modified_count,
@@ -87,11 +87,11 @@ async def delete_list(list_id: str):
         update={"$pull": {"lists": list_id}},
     )
     return {
-        "raw": delete_res.raw_result,
+        "raw": jloads(bdumps(delete_res.raw_result)),
         "ack": delete_res.acknowledged,
         "count": delete_res.deleted_count,
         "user_col_op": {
-            "raw": delete_list_id_from_user_res.raw_result,
+            "raw": jloads(bdumps(delete_list_id_from_user_res.raw_result)),
             "matched": delete_list_id_from_user_res.matched_count,
             "modified": delete_list_id_from_user_res.modified_count,
         },
@@ -118,7 +118,7 @@ async def create_item(list_id: str, body: WriteItemBody):
     response = {
         "id": new_todo_id,
         "ack": insert_res.acknowledged,
-        "raw": insert_res.raw_result,
+        "raw": jloads(bdumps(insert_res.raw_result)),
         "item": body,
     }
     return response
@@ -140,7 +140,7 @@ async def edit_item(list_id: str, item_id: str, body: WriteItemBody):
     response = {
         "ack": update_todo_res.acknowledged,
         "id": update_todo_res.upserted_id,
-        "raw": update_todo_res.raw_result,
+        "raw": jloads(bdumps(update_todo_res.raw_result)),
         "meta": {
             "matched": update_todo_res.matched_count,
             "modified": update_todo_res.modified_count,
@@ -159,7 +159,7 @@ async def delete_todo_item(list_id: str, item_id: str):
     response = {
         "ack": delete_item_from_list_res.acknowledged,
         "id": delete_item_from_list_res.upserted_id,
-        "raw": delete_item_from_list_res.raw_result,
+        "raw": jloads(bdumps(delete_item_from_list_res.raw_result)),
         "matched": delete_item_from_list_res.matched_count,
         "modified": delete_item_from_list_res.modified_count,
     }
