@@ -49,6 +49,7 @@ async def register(body: RegisterBody):
                 body.password.encode(encoding="UTF-8"), bcrypt.gensalt()
             ),
             "lists": [],  # list of ids of lists
+            "posts": [],  # list of ids of posts
         }
         insert_res = user_col.insert_one(user)
         id, ack = insert_res.inserted_id, insert_res.acknowledged

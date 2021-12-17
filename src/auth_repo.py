@@ -22,7 +22,8 @@ class AuthRepository:
 
     def decode_access_token(self, token: str):
         try:
-            res = jwt.decode(token, key=configs.jwt_secret_key, algorithms=["HS256"])
+            res = jwt.decode(token, key=configs.jwt_secret_key,
+                             algorithms=["HS256"])
         except jwt.exceptions.DecodeError:
             raise HTTPException(status_code=401, detail="Token not valid")
         return res
@@ -30,10 +31,12 @@ class AuthRepository:
     def verify_decode_auth_header(self, headers: Header):
         bearer_token = headers.get("Authorization")
         if not bearer_token:
-            raise HTTPException(status_code=401, detail="Token not found; unauthorized")
+            raise HTTPException(
+                status_code=401, detail="Token not found; unauthorized")
         bearer_token_split = bearer_token.split(" ")
         if len(bearer_token_split) != 2:
-            raise HTTPException(status_code=401, detail="Token empty; unauthorized")
+            raise HTTPException(
+                status_code=401, detail="Token empty; unauthorized")
         token = bearer_token_split[1]
         if not self.token or self.token != token:
             self.token = token
