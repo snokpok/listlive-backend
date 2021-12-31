@@ -1,7 +1,6 @@
 import uvicorn
 import configs
-from server import app
-from mongo import user_col, db
+from server import *
 
 if __name__ == "__main__":
     uvicorn.run(

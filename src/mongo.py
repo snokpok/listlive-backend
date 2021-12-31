@@ -24,8 +24,7 @@ import os
 mongo_client = MongoClient(
     UtilsRepository.parse_configs_to_dburi_cloud(db="main"),
     tls=True,
-    tlsCertificateKeyFile=os.path.join(
-        os.path.dirname(os.getcwd()), "keys/read-write.pem"),
+    tlsCertificateKeyFile=os.path.join(os.getcwd(), "keys/read-write.pem"),
 )
 
 db = mongo_client["main"]

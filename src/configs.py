@@ -1,6 +1,7 @@
 import dotenv
 import os
 
-_env_vals = os.environ
+dotenv.load_dotenv(dotenv.find_dotenv(".development.env"))
 
-jwt_secret_key = str(_env_vals.get("JWT_SECRET_KEY"))
+jwt_secret_key = str(os.environ.get("JWT_SECRET_KEY"))
+root_user_db_pwd = str(os.environ.get("MYSQL_ROOT_PASSWORD"))

@@ -9,17 +9,12 @@ from pydantic import BaseModel
 auth_router = APIRouter(prefix="/auth")
 
 
-class LoginBody(BaseModel):
-    email: str
-    password: str
-
-
-@auth_router.post("/login")
-async def login_get_access_token(body: LoginBody):
-    found_user = user_col.find_one({"email": body.email})
+@auth_router.get("/login")
+async def login_get_access_token(email: str, password: str):
+    found_user = user_col.find_one({"email": email})
     if not found_user:
         raise HTTPException(status_code=404, detail="Incorrect email")
-    if not bcrypt.checkpw(body.password.encode("UTF-8"), found_user.get("password")):
+    if not bcrypt.checkpw(password.encode("UTF-8"), found_user.get("password")):
         raise HTTPException(status_code=400, detail="Incorrect password")
     return {
         "token": ar.create_access_token(str(found_user.get("_id"))),
@@ -32,9 +27,11 @@ async def decode_token(token: str):
     return ar.decode_access_token(token)
 
 
-class RegisterBody(LoginBody):
+class RegisterBody(BaseModel):
     first_name: str
     last_name: str
+    email: str
+    password: str
 
 
 @auth_router.post("/register")

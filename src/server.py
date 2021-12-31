@@ -13,6 +13,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 app.include_router(user_router, tags=["user"])
 app.include_router(list_router, tags=["list"], deprecated=True)
 app.include_router(auth_router, tags=["auth"])
